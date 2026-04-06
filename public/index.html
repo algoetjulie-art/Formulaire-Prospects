@@ -291,11 +291,15 @@ function renderField(q) {
 }
 
 function bindFieldEvents(questions) {
-  document.querySelectorAll('.field input, .field select, .field textarea').forEach(el => {
+  // Text inputs & textareas: just store value, no re-render
+  document.querySelectorAll('.field input, .field textarea').forEach(el => {
     el.addEventListener('input', e => {
       answers[e.target.dataset.key] = e.target.value;
-      render();
+      updateNavButton();
     });
+  });
+  // Selects: store + re-render (for conditional fields like "Autre")
+  document.querySelectorAll('.field select').forEach(el => {
     el.addEventListener('change', e => {
       answers[e.target.dataset.key] = e.target.value;
       render();
@@ -314,6 +318,13 @@ function bindFieldEvents(questions) {
       render();
     });
   });
+}
+
+function updateNavButton() {
+  const btn = document.querySelector('.btn-next');
+  if (!btn) return;
+  const canGo = canAdvance();
+  if (canGo) { btn.classList.remove('disabled'); } else { btn.classList.add('disabled'); }
 }
 
 function canAdvance() {
